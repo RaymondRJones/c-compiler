@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 from lexer import *
 from parserClass import *
+from emit import *
 import sys
 def main():
 
@@ -12,8 +13,10 @@ def main():
         input = inputFile.read()
 
     lex = Lexer(input)
-    parser = Parser(lex)
-    
+    emitter = Emitter("out.c")
+    parser = Parser(lex,emitter)
+
     parser.program()
-    print("Parsing Completed")
+    emitter.writeFile() # Write the output to file.
+    print("Compiling completed.")
 main()
