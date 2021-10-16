@@ -87,6 +87,33 @@ class Parser:
 
             self.match(TokenType.ENDIF)
             self.emitter.emitLine("}")
+        # "ELSE IF" comparison "THEN" {statement} "ENDIF"
+        elif self.checkToken(TokenType.ELSEIF):
+            self.nextToken()
+            self.emitter.emit("else if(")
+            self.comparison()
+            self.match(TokenType.THEN)
+            self.nl()
+            self.emitter.emitLine("){")
+
+            while not self.checkToken(TokenType.ENDELSEIF):
+                self.statement()
+
+            self.match(TokenType.ENDELSEIF)
+            self.emitter.emitLine("}")
+        # "ELSE" comparison "THEN" {statement} "ENDIF"
+        elif self.checkToken(TokenType.ELSE):
+            self.nextToken()
+            self.emitter.emit("else")
+            self.match(TokenType.THEN)
+            self.nl()
+            self.emitter.emitLine("{")
+
+            while not self.checkToken(TokenType.ENDELSE):
+                self.statement()
+
+            self.match(TokenType.ENDELSE)
+            self.emitter.emitLine("}")            
         # "WHILE" comparison "REPEAT" {statement} "ENDWHILE"
         elif self.checkToken(TokenType.WHILE):
             self.nextToken()

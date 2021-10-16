@@ -11,6 +11,15 @@ if(0 == scanf("%f", &a)) {
 a = 0;
 scanf("%*s");
 }
+if(a==3){
+printf("You chose 3\n");
+}
+else if(a==4){
+printf("You chose 4\n");
+}
+else{
+printf("You chose a different number\n");
+}
 }
 b = 0;
 s = 0;
