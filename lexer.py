@@ -55,7 +55,7 @@ class Lexer:
         self.curChar = ''   # Current character in the string.
         self.curPos = -1    # Current position in the string.
         self.nextChar()
-
+        self.newLineCount = 0
     # Process the next character.
     def nextChar(self):
         self.curPos += 1
@@ -73,7 +73,7 @@ class Lexer:
 
     # Invalid token found, print error message and exit.
     def abort(self, message):
-        sys.exit("Lexing error - " + message)
+        sys.exit("Lexing error - " + message + " on Line number: " + self.newLineCount)
 		
     # Skip whitespace except newlines, which we will use to indicate the end of a statement.
     def skipWhitespace(self):
@@ -104,6 +104,7 @@ class Lexer:
             token = Token(self.curChar, TokenType.SLASH)
         elif self.curChar == '\n':
             token = Token(self.curChar, TokenType.NEWLINE)
+            self.newLineCount += 1
         elif self.curChar == '\0':
             token = Token('', TokenType.EOF)
         elif self.curChar == '=':
@@ -135,7 +136,7 @@ class Lexer:
                 self.nextChar()
                 token = Token(lastChar + self.curChar, TokenType.NOTEQ)
             else:
-                self.abort("Expected !=, got !" + self.peek())
+                self.abort("Expected !=, got !" + self.peek() + " on Line number: " + self.newLineCount)
         elif self.curChar == '\"':
             # Get chracters between quotations
             self.nextChar()
@@ -143,7 +144,7 @@ class Lexer:
 
             while self.curChar != '\"':
                 if self.curChar == '\r' or self.curChar == '\n' or self.curChar == '\t' or self.curChar == '\\' or self.curChar == '%':
-                    self.abort("Illegal character in string.")
+                    self.abort("Illegal character in string." + " on Line number: " + self.newLineCount)
                 self.nextChar()
             tokText = self.source[startPos : self.curPos] # Get the substring.
             token = Token(tokText, TokenType.STRING)       
@@ -159,7 +160,7 @@ class Lexer:
                 # Must have at least one digit after decimal.
                 if not self.peek().isdigit(): 
                     # Error!
-                    self.abort("Illegal character in number.")
+                    self.abort("Illegal character in number. Line number: " + self.newLineCount)
                 while self.peek().isdigit():
                     self.nextChar()
 
@@ -180,7 +181,7 @@ class Lexer:
             else:   # Keyword
                 token = Token(tokText, keyword)       
         else:
-            self.abort("Unknown Char: " + self.curChar)
+            self.abort("Unknown Char: " + self.curChar + " Line number: " + self.newLineCount)
         
 			
         self.nextChar()

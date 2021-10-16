@@ -14,6 +14,7 @@ class Parser:
         self.nextToken()
         self.nextToken()    # Call this twice to initialize current and peek.
 
+        self.lineNumber = 0
     # Return true if the current token matches.
     def checkToken(self, kind):
         return kind == self.curToken.kind
@@ -25,7 +26,7 @@ class Parser:
     # Try to match current token. If not, error. Advances the current token.
     def match(self, kind):
         if not self.checkToken(kind):
-            self.abort("Expected " + kind.name + ", got " + self.curToken.kind.name)
+            self.abort("Expected " + kind.name + ", got " + self.curToken.kind.name + " On Line Number: " + str(self.lineNumber+1))
         self.nextToken()
 
     # Advances the current token.
@@ -59,7 +60,7 @@ class Parser:
         # Check that each label referenced in a GOTO is declared.
         for label in self.labelsGotoed:
             if label not in self.labelsDeclared:
-                self.abort("Attempting to GOTO to undeclared label: " + label)
+                self.abort("Attempting to GOTO to undeclared label: " + label + " On Line Number: " + str(self.lineNumber+1))
     def statement(self):
         # "PRINT" (expression | string)
         if self.checkToken(TokenType.PRINT):
@@ -134,7 +135,7 @@ class Parser:
 
             # Make sure this label doesn't already exist.
             if self.curToken.text in self.labelsDeclared:
-                self.abort("Label already exists: " + self.curToken.text)
+                self.abort("Label already exists: " + self.curToken.text + " On Line Number: " + str(self.lineNumber+1))
             self.labelsDeclared.add(self.curToken.text)
             
             self.emitter.emitLine(self.curToken.text + ":")
@@ -183,12 +184,12 @@ class Parser:
             
             self.match(TokenType.IDENT)
         else:
-            self.abort("Invalid statement at " + self.curToken.text + " (" + self.curToken.kind.name + ")")      
+            self.abort("Invalid statement at " + self.curToken.text + " (" + self.curToken.kind.name + ")" + " On Line Number: " + str(self.lineNumber+1))      
 
         self.nl()
     def nl(self):
         #self.emitter.emitLine("}")
-
+        self.lineNumber += 1
         #Require at least one newline token
         self.match(TokenType.NEWLINE)
 
@@ -204,7 +205,7 @@ class Parser:
             self.nextToken()
             self.expression()
         else:
-            self.abort("Expected comparison operator at: " + self.curToken.text)
+            self.abort("Expected comparison operator at: " + self.curToken.text + " On Line Number: " + str(self.lineNumber+1))
 
         while self.isComparisonOperator():
             self.emitter.emit(self.curToken.text)
@@ -243,7 +244,7 @@ class Parser:
         elif self.checkToken(TokenType.IDENT):
             # Ensure the variable already exists.
             if self.curToken.text not in self.symbols:
-                self.abort("Referencing variable before assignment: " + self.curToken.text)
+                self.abort("Referencing variable before assignment: " + self.curToken.text + " On Line Number: " + str(self.lineNumber+1))
 
             self.emitter.emit(self.curToken.text)
             self.nextToken()

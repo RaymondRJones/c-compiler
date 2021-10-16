@@ -8,7 +8,7 @@ WHILE a < 1 REPEAT
         PRINT "You chose 3"
     ENDIF
     ELSEIF a == 4 THEN
-        PRINT "You chose 4"
+        PRINT b
     ENDELSEIF
     ELSE THEN
         PRINT "You chose a different number"
